@@ -7,6 +7,7 @@ const router = new express.Router();
 
 
 /** GET /items, returns list of shopping items
+ * 
  *  ex => { items: [ {name: "popsicle", price: 1.45 } ...]}
  */
 router.get("/", function (req, res) {
@@ -35,7 +36,9 @@ router.post("/", function (req, res) {
   return res.json({ "added": newItem });
 });
 
-/**GET /items/:name: get a certain item
+/**GET /items/:name:
+ *
+ * accepts a valid name from url param to get a single item
  * ex => {name: "popsicle", "price": 1.45}
 */
 router.get("/:name", function (req, res) {
