@@ -24,15 +24,15 @@ router.post("/", function (req, res) {
   const price = req.body.price;
 
   // could potentially seperate into middleware
-  if (!(+price)){
-    throw new BadRequestError()
+  if (!(+price)) {
+    throw new BadRequestError();
   }
 
   const newItem = { name, price };
 
   items.push(newItem);
 
-  return res.json({"added": newItem});
+  return res.json({ "added": newItem });
 });
 
 /**GET /items/:name: get a certain item
@@ -40,25 +40,62 @@ router.post("/", function (req, res) {
 */
 router.get("/:name", function (req, res) {
 
-  const name = req.params.name
-  for (let item of items){
-    if (item.name === name){
-      return res.json(item)
+  const name = req.params.name;
+  for (let item of items) {
+    if (item.name === name) {
+      return res.json(item);
     }
   }
 
-  throw new NotFoundError()
+  throw new NotFoundError();
 });
 
-/**PATCH /items/:name: edit a certain item */
+/**PATCH /items/:name:  accept JSON body, modify item, return it
+ *
+ * {name: "new popsicle", price: 2.45} =>
+ * {updated: {name: "new popsicle", price: 2.45}}
+ *
+ */
 router.patch("/:name", function (req, res) {
-  return res.send('edit a certain item');
+
+  const name = req.params.name;
+
+  const updatedName = req.body.name;
+  const updatedPrice = req.body.price;
+
+  if (!(+updatedPrice)) {
+    throw new BadRequestError();
+  }
+
+  for (let item of items) {
+    if (item.name === name) {
+      item.name = updatedName || item.name;
+      item.price = +updatedPrice || item.price;
+      return res.json({ "updated": item });
+    }
+  }
+
+  throw new NotFoundError();
 });
 
-/** DELETE  /items/:name: delete an item, return {message: Deleted} */
+/** DELETE  /items/:name:
+ *
+ * accepts valid name of record in db and
+ * delete the record , return {message: Deleted}
+ *
+ * */
 router.delete("/:name", function (req, res) {
 
-  return res.json({ message: "Deleted" });
+  const name = req.params.name;
+
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].name === name) {
+      items.splice(i, 1);
+      return res.json({ message: "Deleted" });
+    }
+  }
+
+  throw new NotFoundError();
 });
 
 module.exports = router;
